@@ -5,6 +5,7 @@
 //  Created by Alejandro González on 31/03/26.
 //
 
+import SwiftData
 import SwiftUI
 
 struct UserCard: View {
@@ -25,7 +26,9 @@ struct UserCard: View {
 }
 
 struct ContentView: View {
-    @State private var users = [User]()
+
+    @Environment(\.modelContext) var modelContext
+    @Query var users : [User]
     
     var body: some View {
         NavigationStack {
@@ -41,6 +44,7 @@ struct ContentView: View {
     
     func fetchUsers() async {
         guard users.isEmpty else {
+            print("Users not empty")
             return
         }
         
@@ -55,12 +59,12 @@ struct ContentView: View {
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
             if let decoded = try? decoder.decode([User].self, from: data) {
-                users = decoded
+                for user in decoded {
+                    modelContext.insert(user)
+                }
             } else {
                 print("Failed to decode, JSON and data model missmatch")
             }
-            
-            
             
         } catch {
             print("Flopped: \(error.localizedDescription)")
@@ -71,4 +75,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .modelContainer(for: User.self)
 }

@@ -83,10 +83,3 @@ struct UserDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
-
-#Preview {
-    NavigationStack {
-        UserDetailView(user: User(id: UUID(), isActive: true, name: "Alex", age: 20, company: "Flop de Monterrey", email: "A04921384@tec.mx", address: "Aqui y Ahora", about: "Es un papu super duper mega pro", registered: .now, tags: ["Super", "Pro"], friends: [Friend(id: UUID(), name: "Papu 1"), Friend(id: UUID(), name: "Papu 2")]))
-
-    }
-}
