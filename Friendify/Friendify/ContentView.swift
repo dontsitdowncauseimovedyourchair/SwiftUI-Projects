@@ -59,9 +59,15 @@ struct ContentView: View {
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
             if let decoded = try? decoder.decode([User].self, from: data) {
+                
+                //Method to make every entry appear at the same time
+                //A model context inititalized this way does not have auto save enabled
+                let insertContext = ModelContext(modelContext.container)
                 for user in decoded {
-                    modelContext.insert(user)
+                    insertContext.insert(user)
                 }
+                //When calling save, we write all changes at the same time when the container is fully populated
+                try insertContext.save()
             } else {
                 print("Failed to decode, JSON and data model missmatch")
             }
