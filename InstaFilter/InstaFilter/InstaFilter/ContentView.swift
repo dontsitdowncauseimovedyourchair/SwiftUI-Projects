@@ -13,34 +13,18 @@ struct ContentView: View {
     @State private var image: Image?
 
     var body: some View {
-        VStack {
-            image?
-                .resizable()
-                .scaledToFit()
+        ContentUnavailableView {
+            Label("No snippets", systemImage: "swift")
+        } description: {
+            Text("The content has officially flopped")
+        } actions: {
+            Button("Do crazy stuff") {
+                
+            }
+            .buttonStyle(.glassProminent)
         }
-        .onAppear(perform: loadImage)
     }
-
-    func loadImage() {
-        image = Image(.example)
-        
-        let inputImage = UIImage(resource: .example)
-        let beginImage = CIImage(image: inputImage)
-        
-        let context = CIContext()
-        let currentFilter = CIFilter.pixellate()
-        
-        currentFilter.inputImage = beginImage
-        currentFilter.scale = 30
-        
-        guard let filteredRecipe : CIImage = currentFilter.outputImage else { return }
-        
-        guard let actualImage : CGImage = context.createCGImage(filteredRecipe, from: filteredRecipe.extent) else { return }
-        
-        let UIimg = UIImage(cgImage: actualImage)
-        
-        image = Image(uiImage: UIimg)
-    }
+    
 }
 
 #Preview {
