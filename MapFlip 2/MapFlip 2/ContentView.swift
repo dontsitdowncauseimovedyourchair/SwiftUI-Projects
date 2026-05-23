@@ -5,20 +5,31 @@
 //  Created by Alejandro González on 17/05/26.
 //
 
+import PhotosUI
 import SwiftUI
+import SwiftData
+
 
 struct ContentView: View {
+    @Query var entries: [PhotoEntry]
+    @State private var selectedImage: PhotosPickerItem?
+
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationStack {
+            VStack {
+                PhotosPicker(selection: $selectedImage, matching: .all(of: [.images, .depthEffectPhotos, .bursts, .playbackStyle(.imageAnimated)])) {
+                    Label("New epic photo", systemImage: "photo")
+                }
+                List {
+                    
+                }
+            }
         }
-        .padding()
     }
 }
 
 #Preview {
     ContentView()
+        .modelContainer(for: PhotoEntry.self)
 }
