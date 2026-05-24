@@ -5,6 +5,7 @@
 //  Created by Alejandro González on 23/05/26.
 //
 
+import PhotosUI
 import SwiftUI
 
 struct ImageSavingView: View {
@@ -13,7 +14,9 @@ struct ImageSavingView: View {
     var image: Image
     @State private var inTitle = "";
     
-    var onSave: (String) -> Void
+    var onSave: (String, CLLocationDegrees?, CLLocationDegrees?) -> Void
+    
+    static var locationFetcher = LocationFetcher()
 
     var body: some View {
         NavigationStack {
@@ -31,13 +34,17 @@ struct ImageSavingView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        onSave(inTitle)
+                        let location = ImageSavingView.locationFetcher.lastKnownLocation
+                        onSave(inTitle, location?.latitude ?? nil, location?.longitude ?? nil)
                         dismiss()
                     }
                     .background(.blue)
                     .foregroundStyle(.white)
                     .clipShape(.capsule)
                 }
+            }
+            .onAppear {
+                ImageSavingView.locationFetcher.start()
             }
             Spacer()
         }

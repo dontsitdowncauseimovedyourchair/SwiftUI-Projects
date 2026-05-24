@@ -55,9 +55,9 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $showingTitleMenu) {
-                ImageSavingView(image: viewModel.loadImage() ) { title in
+                ImageSavingView(image: viewModel.loadImage() ) { title, latitude, longitude in
                     Task {
-                        let entry = PhotoEntry(photoData: viewModel.selectedData ?? Data(), title: title)
+                        let entry = PhotoEntry(photoData: viewModel.selectedData ?? Data(), title: title, latitude: latitude ?? nil, longitude: longitude ?? nil)
                         modelContext.insert(entry)
                         print("Saved entry!")
                     }

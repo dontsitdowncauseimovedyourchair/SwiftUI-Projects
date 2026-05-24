@@ -22,7 +22,7 @@ extension ContentView {
         }
         
         var selectedData: Data?
-        
+                
         func loadData(from item : PhotosPickerItem?) {
             if let item {
                 Task {
@@ -42,5 +42,7 @@ extension ContentView {
             
             return Image("exclamationmark.warninglight")
         }
+        
+        
     }
 }
