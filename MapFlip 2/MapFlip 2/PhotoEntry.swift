@@ -10,12 +10,23 @@ import SwiftData
 import SwiftUI
 
 @Model
-class PhotoEntry {
-    var image: Image
-    var name: String
+class PhotoEntry : Identifiable {
+    var id = UUID()
     
-    init(image: Image, name: String) {
-        self.image = image
-        self.name = name
+    @Attribute(.externalStorage) private var photoData: Data
+    var title: String
+    
+    var image: Image {
+        if let uiImg = UIImage(data: photoData) {
+            return Image(uiImage: uiImg)
+        } else {
+            return Image(systemName: "image")
+        }
+        
+    }
+    
+    init(photoData: Data, title: String) {
+        self.photoData = photoData
+        self.title = title
     }
 }
