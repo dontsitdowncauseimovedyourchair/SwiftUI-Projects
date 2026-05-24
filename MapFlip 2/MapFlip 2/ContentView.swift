@@ -41,6 +41,7 @@ struct ContentView: View {
                         try? modelContext.save()
                     }
                 }
+                .navigationLinkIndicatorVisibility(.hidden)
                 
                 PhotosPicker(selection: $viewModel.selectedImage, matching: .any(of: [.images, .depthEffectPhotos, .bursts, .playbackStyle(.imageAnimated)])) {
                     Label("New epic photo", systemImage: "photo")
@@ -61,10 +62,11 @@ struct ContentView: View {
                         print("Saved entry!")
                     }
                 }
+                .presentationDetents([.medium])
             }
             .navigationTitle("MapFlip 2")
             .navigationDestination(for: PhotoEntry.self) { entry in
-                
+                ImageDetailView(entry: entry)
             }
         }
     }

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ImageSavingView: View {
+    @Environment(\.dismiss) var dismiss
+    
     var image: Image
     @State private var inTitle = "";
     
@@ -16,19 +18,28 @@ struct ImageSavingView: View {
     var body: some View {
         NavigationStack {
             VStack {
+                TextField("Title", text: $inTitle)
+                    .padding()
+                    .textFieldStyle(.roundedBorder)
+                
                 image
                     .resizable()
                     .scaledToFit()
-                
-                TextField("Title", text: $inTitle)
             }
+            .navigationTitle("Title your photo")
+            .padding()
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         onSave(inTitle)
+                        dismiss()
                     }
+                    .background(.blue)
+                    .foregroundStyle(.white)
+                    .clipShape(.capsule)
                 }
             }
+            Spacer()
         }
     }
 }
