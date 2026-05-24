@@ -16,18 +16,30 @@ struct ContentView: View {
     @State private var showingTitleMenu = false
     
     @State private var viewModel = ViewModel()
+    
         
     var body: some View {
         NavigationStack {
             VStack {
-                List(entries) { entry in
-                    NavigationLink(value: entry, label: {
-                        entry.image
-                            .resizable()
-                            .scaledToFit()
-                        
-                        Text(entry.title)
-                    })
+                List {
+                    ForEach(entries) { entry in
+                        NavigationLink(value: entry, label: {
+                            VStack {
+                                entry.image
+                                    .resizable()
+                                    .scaledToFit()
+                                
+                                Text(entry.title)
+                            }
+                        })
+                    }
+                    .onDelete { indexSet in
+                        for index in indexSet {
+                            let entry = entries[index]
+                            modelContext.delete(entry)
+                        }
+                        try? modelContext.save()
+                    }
                 }
                 
                 PhotosPicker(selection: $viewModel.selectedImage, matching: .any(of: [.images, .depthEffectPhotos, .bursts, .playbackStyle(.imageAnimated)])) {
