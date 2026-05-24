@@ -12,24 +12,25 @@ import SwiftUI
 struct ImageDetailView: View {
     var entry: PhotoEntry
     
-
-    
     var body: some View {
         VStack {
             entry.image
                 .resizable()
-                .scaledToFit()
-                .frame(maxWidth: .infinity)
-            
+                .scaledToFill()
+                .clipped()
+                .containerRelativeFrame(.vertical, count: 3, span: 2, spacing: 0)
+
             if let location = entry.location {
-                Map(initialPosition: MapCameraPosition.region(MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.3, longitudeDelta: 0.3)))) {
+                Map(initialPosition: MapCameraPosition.region(MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)))) {
                     Marker(entry.title, coordinate: location)
                 }
                 .frame(maxWidth: .infinity)
+                .containerRelativeFrame(.vertical, count: 3, span: 1, spacing: 0)
             }
         }
-        .ignoresSafeArea()
-        .padding()
+        .ignoresSafeArea(edges: [.bottom, .horizontal])
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .navigationTitle(entry.title)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

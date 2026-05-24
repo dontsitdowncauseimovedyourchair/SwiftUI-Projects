@@ -30,6 +30,7 @@ struct ContentView: View {
                                     .scaledToFit()
                                 
                                 Text(entry.title)
+                                    .font(.headline.bold())
                             }
                         })
                     }
