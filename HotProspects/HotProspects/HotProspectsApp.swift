@@ -5,13 +5,15 @@
 //  Created by Alejandro González on 16/06/26.
 //
 
+import SwiftData
 import SwiftUI
 
 @main
 struct HotProspectsApp: App {
     var body: some Scene {
         WindowGroup {
-            PushNotisView()
+            ContentView()
         }
+        .modelContainer(for: Prospect.self)
     }
 }
