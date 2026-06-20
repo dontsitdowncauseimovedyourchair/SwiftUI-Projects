@@ -17,6 +17,7 @@ struct ProspectsView: View {
     
     @Environment(\.modelContext) var modelContext
     @Query(sort: \Prospect.name) var prospects: [Prospect]
+    @State private var isSortingByMostRecent = false
     
     @State private var isShowingScanner = false
     @State private var selectedProspects = Set<Prospect>()
@@ -38,12 +39,23 @@ struct ProspectsView: View {
         NavigationStack {
             VStack {
                 List(prospects, selection: $selectedProspects) { prospect in
-                    VStack(alignment: .leading) {
-                        Text(prospect.name)
-                            .font(.headline)
+                    NavigationLink {
+                        ProspectDetailView(prospect: prospect)
+                    } label: {
+                        if filter == .none {
+                            Image(systemName: prospect.isContacted ? "person.and.background.striped.horizontal" : "person.crop.circle.badge.questionmark.fill")
+                                .font(.largeTitle)
+                                .frame(width: 50)
+                                .scaledToFill()
+                        }
                         
-                        Text(prospect.emailAddress)
-                            .foregroundStyle(.secondary)
+                        VStack(alignment: .leading) {
+                            Text(prospect.name)
+                                .font(.headline)
+                            
+                            Text(prospect.emailAddress)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                     .swipeActions {
                         Button("Delete", systemImage: "trash") {
@@ -52,12 +64,12 @@ struct ProspectsView: View {
                         .tint(.red)
                         
                         if prospect.isContacted == false {
-                            Button("Befriend", systemImage: "person.crop.circle.fill.badge.checkmark") {
+                            Button("Befriend", systemImage: "person.crop.circle.badge.questionmark.fill") {
                                 prospect.isContacted = true
                             }
                             .tint(.blue)
                         } else {
-                            Button("Strand in Oblivion", systemImage: "person.crop.circle.badge.xmark") {
+                            Button("Strand in Oblivion", systemImage: "person.and.background.striped.horizontal") {
                                 prospect.isContacted = false
                             }
                         }
@@ -77,11 +89,17 @@ struct ProspectsView: View {
                 }
                 
                 if !selectedProspects.isEmpty {
-                    ToolbarItem(placement: .bottomBar) {
+                    ToolbarItem(placement: .topBarLeading) {
                         Button("Delete", systemImage: "trash", role: .destructive) {
                             delete()
                         }
                         .tint(.red)
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Sort", systemImage: isSortingByMostRecent ? "calendar.circle" : "a.circle") {
+                        isSortingByMostRecent.toggle()
                     }
                 }
                 
