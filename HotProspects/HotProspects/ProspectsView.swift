@@ -65,6 +65,7 @@ struct ProspectsView: View {
                         Button("Remind Me", systemImage: "bell") {
                             addNotification(for: prospect)
                         }
+                        .tint(.orange)
                     }
                     .tag(prospect)
                 }
