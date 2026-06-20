@@ -4,11 +4,11 @@
 //
 //  Created by Alejandro González on 17/06/26.
 //
-
+import AVFoundation
 import CodeScanner
 import SwiftData
 import SwiftUI
-import AVFoundation
+import UserNotifications
 
 struct ProspectsView: View {
     enum FilterType {
@@ -19,6 +19,7 @@ struct ProspectsView: View {
     @Query(sort: \Prospect.name) var prospects: [Prospect]
     
     @State private var isShowingScanner = false
+    @State private var selectedProspects = Set<Prospect>()
     
     let filter: FilterType
     
@@ -36,7 +37,7 @@ struct ProspectsView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                List(prospects) { prospect in
+                List(prospects, selection: $selectedProspects) { prospect in
                     VStack(alignment: .leading) {
                         Text(prospect.name)
                             .font(.headline)
@@ -44,12 +45,49 @@ struct ProspectsView: View {
                         Text(prospect.emailAddress)
                             .foregroundStyle(.secondary)
                     }
+                    .swipeActions {
+                        Button("Delete", systemImage: "trash") {
+                            modelContext.delete(prospect)
+                        }
+                        .tint(.red)
+                        
+                        if prospect.isContacted == false {
+                            Button("Befriend", systemImage: "person.crop.circle.fill.badge.checkmark") {
+                                prospect.isContacted = true
+                            }
+                            .tint(.blue)
+                        } else {
+                            Button("Strand in Oblivion", systemImage: "person.crop.circle.badge.xmark") {
+                                prospect.isContacted = false
+                            }
+                        }
+                        
+                        Button("Remind Me", systemImage: "bell") {
+                            addNotification(for: prospect)
+                        }
+                    }
+                    .tag(prospect)
                 }
             }
             .navigationTitle(title)
             .toolbar {
-                Button("Scan", systemImage: "qrcode.viewfinder") {
-                    isShowingScanner = true
+                ToolbarItem(placement: .topBarLeading) {
+                    EditButton()
+                }
+                
+                if !selectedProspects.isEmpty {
+                    ToolbarItem(placement: .bottomBar) {
+                        Button("Delete", systemImage: "trash", role: .destructive) {
+                            delete()
+                        }
+                        .tint(.red)
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Scan", systemImage: "qrcode.viewfinder") {
+                        isShowingScanner = true
+                    }
                 }
             }
             .sheet(isPresented: $isShowingScanner) {
@@ -83,6 +121,48 @@ struct ProspectsView: View {
             modelContext.insert(person)
         case .failure(let failure):
             print("Scanning flopped: \(failure.localizedDescription)")
+        }
+    }
+    
+    func delete() {
+        for prospect in selectedProspects {
+            modelContext.delete(prospect)
+        }
+    }
+    
+    func addNotification(for prospect: Prospect) {
+        let center = UNUserNotificationCenter.current()
+        
+        let addRequest = {
+            let content = UNMutableNotificationContent()
+            content.title = "Contact \(prospect.name)"
+            content.subtitle = prospect.emailAddress
+            content.sound = UNNotificationSound.default
+            
+//            var dateComponents = DateComponents()
+//            dateComponents.hour = 9
+//            
+//            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+//
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+            
+            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+            
+            center.add(request)
+        }
+        
+        center.getNotificationSettings { settings in
+            if settings.authorizationStatus == .authorized {
+                addRequest()
+            } else {
+                center.requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
+                    if success {
+                        addRequest()
+                    } else if let error {
+                        print(error.localizedDescription)
+                    }
+                }
+            }
         }
     }
 }
