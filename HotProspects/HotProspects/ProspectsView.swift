@@ -113,6 +113,9 @@ struct ProspectsView: View {
             .sheet(isPresented: $isShowingScanner) {
                 CodeScannerView(codeTypes: [.qr], simulatedData: "FlipFlop\nflipflop@flop.com", completion: handleScan)
             }
+            .onAppear {
+                selectedProspects = []
+            }
         }
     }
     
