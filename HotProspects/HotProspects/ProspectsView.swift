@@ -17,8 +17,9 @@ struct ProspectsView: View {
     
     @Environment(\.modelContext) var modelContext
     @Query(sort: \Prospect.name) var prospects: [Prospect]
-    @State private var isSortingByMostRecent = false
     
+    @Binding var isSortingByMostRecent: Bool
+
     @State private var isShowingScanner = false
     @State private var selectedProspects = Set<Prospect>()
     
@@ -115,15 +116,18 @@ struct ProspectsView: View {
         }
     }
     
-    init(filter: FilterType) {
+    init(filter: FilterType, isSortingByMostRecent: Binding<Bool>) {
         self.filter = filter
+        self._isSortingByMostRecent = isSortingByMostRecent
         
         if filter != .none {
             let showContactedOnly = filter == .contacted
             
             _prospects = Query(filter: #Predicate { prospect in
                 prospect.isContacted == showContactedOnly
-            }, sort: [SortDescriptor(\Prospect.name)])
+            }, sort: [isSortingByMostRecent.wrappedValue ? (SortDescriptor(\Prospect.dateAdded)) : (SortDescriptor(\Prospect.name))])
+        } else {
+            _prospects = Query(sort: [isSortingByMostRecent.wrappedValue ? (SortDescriptor(\Prospect.dateAdded)) : (SortDescriptor(\Prospect.name))])
         }
     }
     
@@ -187,6 +191,6 @@ struct ProspectsView: View {
 }
 
 #Preview {
-    ProspectsView(filter: .none)
+    ProspectsView(filter: .none, isSortingByMostRecent: .constant(false))
         .modelContainer(for: Prospect.self)
 }

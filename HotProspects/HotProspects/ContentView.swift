@@ -9,18 +9,20 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
+    @State private var isSortingByMostRecent = false
+    
     var body: some View {
         TabView {
             Tab("Everyone", systemImage: "person.3") {
-                ProspectsView(filter: .none)
+                ProspectsView(filter: .none, isSortingByMostRecent: $isSortingByMostRecent)
             }
             
             Tab("Contacted", systemImage: "checkmark.circle") {
-                ProspectsView(filter: .contacted)
+                ProspectsView(filter: .contacted, isSortingByMostRecent: $isSortingByMostRecent)
             }
             
             Tab("Strangers Dangers", systemImage: "questionmark.diamond") {
-                ProspectsView(filter: .uncontacted)
+                ProspectsView(filter: .uncontacted, isSortingByMostRecent: $isSortingByMostRecent)
             }
             
             Tab("Me", systemImage: "person.crop.square") {
