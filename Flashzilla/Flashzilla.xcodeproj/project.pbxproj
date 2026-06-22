@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5BCE52BA2FE8AC330097A221 /* PhaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCE52B92FE8AC330097A221 /* PhaseView.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		5BCE52A52FE7C3430097A221 /* Flashzilla.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flashzilla.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5BCE52B92FE8AC330097A221 /* PhaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhaseView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -32,6 +37,7 @@
 		5BCE529C2FE7C3430097A221 = {
 			isa = PBXGroup;
 			children = (
+				5BCE52B92FE8AC330097A221 /* PhaseView.swift */,
 				5BCE52A72FE7C3430097A221 /* Flashzilla */,
 				5BCE52A62FE7C3430097A221 /* Products */,
 			);
@@ -119,6 +125,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5BCE52BA2FE8AC330097A221 /* PhaseView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
