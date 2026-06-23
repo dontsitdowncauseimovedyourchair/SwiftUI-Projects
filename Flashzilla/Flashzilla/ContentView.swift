@@ -20,6 +20,8 @@ extension View {
 
 
 struct ContentView: View {
+    @Environment(\.accessibilityDifferentiateWithoutColor) var accessibilityDifferentiateWithoutColor
+    
     @State private var cards = Array<Card>(repeating: .example, count: 10)
     
     var body: some View {
@@ -31,12 +33,43 @@ struct ContentView: View {
             VStack {
                 ZStack {
                     ForEach(0..<cards.count, id: \.self) { index in
-                        CardView(card: cards[index])
-                            .stacked(at: index, in: cards.count)
+                        CardView(card: cards[index]) {
+                            withAnimation {
+                                deleteCard(at: index)
+                            }
+                        }
+                        .stacked(at: index, in: cards.count)
                     }
                 }
             }
+            
+            if accessibilityDifferentiateWithoutColor {
+                VStack {
+                    Spacer()
+                    HStack {
+                        Image(systemName: "xmark.circle")
+                            .padding()
+                            .background(.black.opacity(0.7))
+                            .clipShape(.circle)
+                        
+                        
+                        Spacer()
+                        
+                        Image(systemName: "checkmark.circle")
+                            .padding()
+                            .background(.black.opacity(0.7))
+                            .clipShape(.circle)
+                    }
+                    .foregroundStyle(.white)
+                    .font(.largeTitle)
+                    .padding()
+                }
+            }
         }
+    }
+    
+    func deleteCard(at index: Int) {
+        cards.remove(at: index)
     }
 }
 

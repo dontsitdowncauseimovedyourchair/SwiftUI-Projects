@@ -8,15 +8,31 @@
 import SwiftUI
 
 struct CardView: View {
+    @Environment(\.accessibilityDifferentiateWithoutColor) var accessibilityDifferentiateWithoutColor
+    
     @State private var isShowingAnswer = false
     @State private var offset = CGSize.zero
 
     let card: Card
     
+    var removalCallable: (()->Void)? = nil
+    
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 25)
-                .fill(.white)
+                .fill(
+                    accessibilityDifferentiateWithoutColor ?
+                        .white
+                    :
+                        .white.opacity(1-Double(abs(offset.width / 100)))
+                )
+                .background(
+                    accessibilityDifferentiateWithoutColor ?
+                        nil
+                    :
+                        RoundedRectangle(cornerRadius: 25)
+                            .fill(offset.width > 0 ? .green : .red)
+                )
                 .shadow(radius:10)
             
             VStack {
@@ -34,6 +50,9 @@ struct CardView: View {
             .multilineTextAlignment(.center)
         }
         .frame(width: 450, height: 250)
+        .offset(x: offset.width * 4.0)
+        .rotationEffect(.degrees(offset.width / 5.0))
+        .opacity(2 - (abs(offset.width / 50.0)))
         .onTapGesture {
             isShowingAnswer.toggle()
         }
@@ -44,7 +63,7 @@ struct CardView: View {
                 })
                 .onEnded({ _ in
                     if abs(offset.width) > 100 {
-                        //REMOVE THE CARD
+                        removalCallable?() //OJO: Calls the funcion if there is one and does nothing if there is none
                     } else {
                         offset = CGSize.zero
                     }
