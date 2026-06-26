@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+extension Shape {
+    func swipeColors(offset: Double, left: Color = .red, right: Color = .green) -> some View {
+        return self.fill(offset > 0 ? right : offset < 0 ? left : .white)
+    }
+}
+
 struct CardView: View {
     @Environment(\.accessibilityDifferentiateWithoutColor) var accessibilityDifferentiateWithoutColor
     @Environment(\.accessibilityVoiceOverEnabled) var accessibilityVoiceOverEnabled
@@ -32,7 +38,7 @@ struct CardView: View {
                         nil
                     :
                         RoundedRectangle(cornerRadius: 25)
-                            .fill(offset.width > 0 ? .green : .red)
+                            .swipeColors(offset: offset.width)
                 )
                 .shadow(radius:10)
             
