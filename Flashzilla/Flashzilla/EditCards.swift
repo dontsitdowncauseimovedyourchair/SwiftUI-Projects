@@ -10,6 +10,11 @@ import SwiftUI
 struct EditCards: View {
     @Environment(\.dismiss) var dismiss
 
+    
+    enum Field { case prompt, answer }
+    @FocusState private var focusedField: Field?
+
+
     @State private var cards = [Card]()
     @State private var newPrompt = ""
     @State private var newAnswer = ""
@@ -17,9 +22,13 @@ struct EditCards: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Add new car") {
+                Section("Add new card") {
                     TextField("Prompt", text: $newPrompt)
+                        .focused($focusedField, equals: .prompt)
                     TextField("Answer", text: $newAnswer)
+                        .focused($focusedField, equals: .answer)
+                }
+                Section {
                     Button("Add Card", action: addCard)
                 }
                 
@@ -50,6 +59,7 @@ struct EditCards: View {
     func loadData() {
         if let data = UserDefaults.standard.data(forKey: "Cards") {
             if let decoded = try? JSONDecoder().decode([Card].self, from: data) {
+                print("Decoded: \(decoded)")
                 cards = decoded
             }
         }
@@ -62,12 +72,15 @@ struct EditCards: View {
     }
     
     func addCard() {
+        focusedField = nil
         let trimmedPrompt = newPrompt.trimmingCharacters(in: .whitespaces)
         let trimmedAnswer = newAnswer.trimmingCharacters(in: .whitespaces)
         guard trimmedPrompt.isEmpty == false && trimmedAnswer.isEmpty == false else {
             return
         }
         
+        newPrompt = ""
+        newAnswer = ""
         let card = Card(prompt: trimmedPrompt, answer: trimmedAnswer)
         cards.insert(card, at: 0)
         saveData()
