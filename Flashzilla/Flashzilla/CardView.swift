@@ -22,7 +22,8 @@ struct CardView: View {
 
     let card: Card
     
-    var removalCallable: (()->Void)? = nil
+    var rightAnswerCallable: (()->Void)? = nil
+    var wrongAnswerCallable: (()->Void)? = nil
     
     var body: some View {
         ZStack {
@@ -76,8 +77,10 @@ struct CardView: View {
                     offset = value.translation
                 })
                 .onEnded({ _ in
-                    if abs(offset.width) > 100 {
-                        removalCallable?() //OJO: Calls the funcion if there is one and does nothing if there is none
+                    if offset.width > 100 {
+                        rightAnswerCallable?() //OJO: Calls the funcion if there is one and does nothing if there is none
+                    } else if offset.width < -100 {
+                        wrongAnswerCallable?()
                     } else {
                         offset = CGSize.zero
                     }

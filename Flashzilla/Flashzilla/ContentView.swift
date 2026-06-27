@@ -51,12 +51,21 @@ struct ContentView: View {
                     .clipShape(.capsule)
                 
                 ZStack {
-                    ForEach(0..<cards.count, id: \.self) { index in
-                        CardView(card: cards[index]) {
+                    ForEach(Array(cards.enumerated()), id: \.element.id) { index, card in
+                        CardView(card: card, rightAnswerCallable: {
                             withAnimation {
-                                deleteCard(at: index)
+                                deleteCard(card: card) //This method also checks if there are no more cards left
                             }
-                        }
+                        }, wrongAnswerCallable: {
+                            withAnimation {
+                                if let index = cards.firstIndex(of: card) {
+                                    cards.remove(at: index)
+                                }
+                                //I need to make a new card so SwiftUI doesn't treat the new insertion as having
+                                //changed nothing due to the inserted card and the deleted one having the same UUID
+                                cards.insert(Card(prompt: card.prompt, answer: card.answer), at: 0)
+                            }
+                        })
                         .stacked(at: index, in: cards.count)
                         .allowsHitTesting(index == cards.count - 1)
                         .accessibilityHidden(index < cards.count - 1)
@@ -99,7 +108,7 @@ struct ContentView: View {
                     HStack {
                         Button {
                             withAnimation {
-                                deleteCard(at: cards.count - 1)
+                                deleteCard(card: cards[cards.count - 1])
                             }
                         } label: {
                             Image(systemName: "xmark.circle")
@@ -115,7 +124,7 @@ struct ContentView: View {
                         
                         Button {
                             withAnimation {
-                                deleteCard(at: cards.count - 1)
+                                deleteCard(card: cards[cards.count - 1])
                             }
                         } label: {
                             Image(systemName: "checkmark.circle")
@@ -152,10 +161,10 @@ struct ContentView: View {
         .onAppear(perform: resetCards)
     }
     
-    func deleteCard(at index: Int) {
-        guard index >= 0 else { return }
-        
-        cards.remove(at: index)
+    func deleteCard(card: Card) {
+        if let foundIndex = cards.firstIndex(of: card) {
+            cards.remove(at: foundIndex)
+        }
         
         if cards.isEmpty {
             isActive = false

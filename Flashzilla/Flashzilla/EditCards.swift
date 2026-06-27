@@ -33,11 +33,11 @@ struct EditCards: View {
                 }
                 
                 Section {
-                    ForEach(0..<cards.count) { index in
+                    ForEach(cards) { card in
                         VStack(alignment: .leading) {
-                            Text(cards[index].prompt)
+                            Text(card.prompt)
                                 .font(.headline)
-                            Text(cards[index].answer)
+                            Text(card.answer)
                                 .foregroundStyle(.secondary)
                         }
                     }
