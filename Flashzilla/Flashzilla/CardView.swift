@@ -20,7 +20,7 @@ struct CardView: View {
     @State private var isShowingAnswer = false
     @State private var offset = CGSize.zero
 
-    let card: Card
+    let card: SessionCard
     
     var rightAnswerCallable: (()->Void)? = nil
     var wrongAnswerCallable: (()->Void)? = nil
@@ -91,5 +91,5 @@ struct CardView: View {
 }
 
 #Preview {
-    CardView(card: Card.example)
+    CardView(card: SessionCard.example)
 }

@@ -5,17 +5,19 @@
 //  Created by Alejandro González on 26/06/26.
 //
 
+import SwiftData
 import SwiftUI
 
 struct EditCards: View {
     @Environment(\.dismiss) var dismiss
-
+    @Environment(\.modelContext) var modelContext
+    
+    @Query var storedCards: [Card]
+    
     
     enum Field { case prompt, answer }
     @FocusState private var focusedField: Field?
 
-
-    @State private var cards = [Card]()
     @State private var newPrompt = ""
     @State private var newAnswer = ""
     
@@ -33,7 +35,7 @@ struct EditCards: View {
                 }
                 
                 Section {
-                    ForEach(cards) { card in
+                    ForEach(storedCards) { card in
                         VStack(alignment: .leading) {
                             Text(card.prompt)
                                 .font(.headline)
@@ -48,28 +50,12 @@ struct EditCards: View {
             .toolbar {
                 Button("Done", action: done)
             }
-            .onAppear(perform: loadData)
         }
     }
     
     func done() {
         addCard()
         dismiss()
-    }
-    
-    func loadData() {
-        if let data = UserDefaults.standard.data(forKey: "Cards") {
-            if let decoded = try? JSONDecoder().decode([Card].self, from: data) {
-                print("Decoded: \(decoded)")
-                cards = decoded
-            }
-        }
-    }
-    
-    func saveData() {
-        if let data = try? JSONEncoder().encode(cards) {
-            UserDefaults.standard.set(data, forKey: "Cards")
-        }
     }
     
     func addCard() {
@@ -83,13 +69,13 @@ struct EditCards: View {
         newPrompt = ""
         newAnswer = ""
         let card = Card(prompt: trimmedPrompt, answer: trimmedAnswer)
-        cards.insert(card, at: 0)
-        saveData()
+        modelContext.insert(card)
     }
     
     func removeCards(at offsets: IndexSet) {
-        cards.remove(atOffsets: offsets)
-        saveData()
+        for index in offsets {
+            modelContext.delete(storedCards[index])
+        }
     }
 }
 

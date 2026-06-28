@@ -5,8 +5,9 @@
 //  Created by Alejandro González on 21/06/26.
 //
 
-import SwiftUI
 import Combine
+import SwiftData
+import SwiftUI
 
 
 extension View {
@@ -25,9 +26,11 @@ struct ContentView: View {
     @Environment(\.accessibilityVoiceOverEnabled) var accessibilityVoiceOverEnabled
     @Environment(\.scenePhase) var scenePhase
     
+    @Query var storedCards: [Card]
+    
     @State private var showingEditScreen = false
     
-    @State private var cards = [Card]()
+    @State private var cards = [SessionCard]()
     
     @State private var timeRemaining = 100
     
@@ -58,12 +61,7 @@ struct ContentView: View {
                             }
                         }, wrongAnswerCallable: {
                             withAnimation {
-                                if let index = cards.firstIndex(of: card) {
-                                    cards.remove(at: index)
-                                }
-                                //I need to make a new card so SwiftUI doesn't treat the new insertion as having
-                                //changed nothing due to the inserted card and the deleted one having the same UUID
-                                cards.insert(Card(prompt: card.prompt, answer: card.answer), at: 0)
+                                reintroduceCard(card: card)
                             }
                         })
                         .stacked(at: index, in: cards.count)
@@ -108,7 +106,7 @@ struct ContentView: View {
                     HStack {
                         Button {
                             withAnimation {
-                                deleteCard(card: cards[cards.count - 1])
+                                reintroduceCard(card: cards[cards.count - 1])
                             }
                         } label: {
                             Image(systemName: "xmark.circle")
@@ -161,7 +159,7 @@ struct ContentView: View {
         .onAppear(perform: resetCards)
     }
     
-    func deleteCard(card: Card) {
+    func deleteCard(card: SessionCard) {
         if let foundIndex = cards.firstIndex(of: card) {
             cards.remove(at: foundIndex)
         }
@@ -171,12 +169,22 @@ struct ContentView: View {
         }
     }
     
-    func loadData() {
-        if let data = UserDefaults.standard.data(forKey: "Cards") {
-            if let decoded = try? JSONDecoder().decode([Card].self, from: data) {
-                cards = decoded
-            }
+    func reintroduceCard(card: SessionCard) {
+        if let index = cards.firstIndex(of: card) {
+            cards.remove(at: index)
         }
+        //New SessionCard gets a fresh UUID so SwiftUI creates a new CardView with clean drag state
+        cards.insert(SessionCard(prompt: card.prompt, answer: card.answer), at: 0)
+    }
+    
+    func loadData() {
+        #if DEBUG
+        print("Current global cards")
+        for card in storedCards {
+            print(card.prompt)
+        }
+        #endif
+        cards = storedCards.map { $0.asSessionCard() }
     }
     
     func resetCards() {
